@@ -158,4 +158,4 @@ jobs:
       - name: 🔄 Redéployer pods avec les nouvelles images
         run: |
           kubectl rollout restart deployment django-backend
-          kubectl rollout restart deployment react-frontend
+          kubectl rollout restart deployment frontend
