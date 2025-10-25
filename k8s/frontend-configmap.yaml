@@ -1,12 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: frontend-config
+  name: frontend-config-json
 data:
-  # 🌍 API accessible depuis un navigateur externe (ton hôte Windows)
-  VITE_API_URL: "http://192.168.88.245:30000"
-  VITE_WS_URL: "ws://192.168.88.245:30000"
-
-  # 🐳 API accessible depuis le cluster Kubernetes
-  VITE_API_DOCKER: "http://backend:8000"
-  VITE_WS_DOCKER: "ws://backend:8000"
+  config.json: |
+    {
+      "API_URL": "http://192.168.88.245:30000",
+      "WS_URL": "ws://192.168.88.245:30000"
+    }

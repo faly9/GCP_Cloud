@@ -17,6 +17,11 @@ spec:
           image: faly9/freelance-frontend:latest
           ports:
             - containerPort: 80
-          envFrom:
-            - configMapRef:
-                name: frontend-config
+          volumeMounts:
+            - name: config-volume
+              mountPath: /usr/share/nginx/html/config.json
+              subPath: config.json
+      volumes:
+        - name: config-volume
+          configMap:
+            name: frontend-config-json
