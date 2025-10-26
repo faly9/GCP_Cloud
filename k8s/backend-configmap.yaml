@@ -10,3 +10,4 @@ data:
   DB_PORT: "3306"
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"
+  FRONTEND_URL: "http://192.168.88.245:5173"
