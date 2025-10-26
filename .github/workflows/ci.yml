@@ -141,19 +141,11 @@ jobs:
 
       - name: 🚀 Déployer les Deployments
         run: |
-          kubectl apply -f k8s/mysql-deployment.yaml
-          kubectl apply -f k8s/mysql-service.yaml
-
-          kubectl apply -f k8s/redis-deployment.yaml
-          kubectl apply -f k8s/redis-service.yaml
-
-          kubectl apply -f k8s/backend-deployment.yaml
-          kubectl apply -f k8s/backend-service.yaml
-
-          kubectl apply -f k8s/frontend-deployment.yaml
-          kubectl apply -f k8s/frontend-service.yaml
-
-          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/Frontend/
+          kubectl apply -f k8s/Backend/
+          kubectl apply -f k8s/Mysql/
+          kubectl apply -f k8s/Redis/
+          kubectl apply -f k8s/Media/
 
       - name: 🔄 Redéployer pods avec les nouvelles images
         run: |

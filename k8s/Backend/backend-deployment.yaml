@@ -22,3 +22,10 @@ spec:
                 name: backend-config
             - secretRef:
                 name: backend-secret
+          volumeMounts:
+            - name: media-storage
+              mountPath: /app/media 
+      volumes:
+        - name: media-storage
+          persistentVolumeClaim:
+            claimName: media-pvc 

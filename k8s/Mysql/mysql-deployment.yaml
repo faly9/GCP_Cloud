@@ -24,6 +24,7 @@ spec:
               value: "2975"
             - name: MYSQL_ROOT_PASSWORD
               value: "faly09+/+"
+
           ports:
             - containerPort: 3306
           volumeMounts:
@@ -31,4 +32,5 @@ spec:
               mountPath: /var/lib/mysql
       volumes:
         - name: mysql-data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: mysql-pvc
