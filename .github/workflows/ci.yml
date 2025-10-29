@@ -135,6 +135,7 @@ jobs:
 
       - name: 🚀 Déployer les Deployments
         run: |
+          kubectl delete pvc media-pvc --ignore-not-found=true
           kubectl apply -f k8s/Frontend/
           kubectl apply -f k8s/Backend/
           kubectl apply -f k8s/Mysql/
