@@ -6,7 +6,7 @@ spec:
   capacity:
     storage: 1Gi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   hostPath:           # ✅ le volume est stocké sur ton PC (Minikube host)
     path: /mnt/data/media
   persistentVolumeReclaimPolicy: Retain
