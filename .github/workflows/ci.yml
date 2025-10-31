@@ -132,6 +132,15 @@ jobs:
     steps:
       - name: 🧩 Checkout code
         uses: actions/checkout@v4
+      - name: 🔑 Set up Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: 🌐 Vérifier la connexion au cluster
+          run: kubectl get nodes
+      
 
       - name: 🚀 Déployer les Deployments
         run: |
