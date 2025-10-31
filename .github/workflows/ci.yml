@@ -139,7 +139,7 @@ jobs:
           chmod 600 $HOME/.kube/config
 
       - name: 🌐 Vérifier la connexion au cluster
-          run: kubectl get nodes
+        run: kubectl get nodes
       
 
       - name: 🚀 Déployer les Deployments
