@@ -12,6 +12,24 @@ spec:
       labels:
         app: frontend
     spec:
+      initContainers:
+        - name: wait-for-backend
+          image: busybox:1.36
+          command: ['sh', '-c', '
+            echo "⏳ Waiting for backend...";
+            until nc -z backend 8000; do
+              echo "Backend not ready yet...";
+              sleep 5;
+            done;
+            echo "✅ Backend ready!";
+            
+            echo "⏳ Waiting for Redis...";
+            until nc -z redis 6379; do
+              echo "Redis not ready yet...";
+              sleep 5;
+            done;
+            echo "✅ Redis ready!";
+          ']
       containers:
         - name: frontend
           image: faly9/freelance-frontend:latest
