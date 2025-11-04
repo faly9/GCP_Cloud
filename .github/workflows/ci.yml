@@ -103,8 +103,8 @@ jobs:
       - name: 🔍 Build frontend (Vite)
         working-directory: ./frontend
         env:
-          VITE_API_URL: http://localhost:8000
-          VITE_WS_URL: ws://localhost:8000
+          VITE_API_URL: http://192.168.88.27:5173
+          VITE_WS_URL: ws://192.168.88.27:5173
         run: npm run build
 
       - name: 🐳 Connexion à Docker Hub
