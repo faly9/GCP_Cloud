@@ -38,18 +38,18 @@ spec:
           volumeMounts:
             - name: nginx-config
               mountPath: /etc/nginx/conf.d
-            # - name: frontend-config
-            #   mountPath: /usr/share/nginx/html/config.json
-            #   subPath: config.json
+            - name: frontend-config
+              mountPath: /usr/share/nginx/html/config.json
+              subPath: config.json
             - name: media-storage
               mountPath: /usr/share/nginx/html/media
       volumes:
         - name: nginx-config
           configMap:
             name: frontend-nginx-config
-        # - name: frontend-config
-        #   configMap:
-        #     name: frontend-config-json
+        - name: frontend-config
+          configMap:
+            name: frontend-config-json
         - name: media-storage
           persistentVolumeClaim:
             claimName: media-pvc
