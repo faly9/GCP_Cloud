@@ -126,34 +126,51 @@ jobs:
     # -----------------------------
   # Job 2 : Déploiement (CD)
   # -----------------------------
-  deploy:
-    runs-on: self-hosted      # ton runner local avec Minikube
-    needs: build-test  
-    env:
-      IMAGE_TAG: ${{ github.run_number }}   
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}     # attendre que CI soit terminé
-    steps:
-      - name: 🧩 Checkout code
-        uses: actions/checkout@v4      
+deploy:
+  runs-on: self-hosted        # Runner local avec Minikube
+  needs: build-test           # Attend la fin du job CI
+  env:
+    IMAGE_TAG: ${{ github.run_number }}
+    DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
 
-      - name: 🚀 Déployer les Deployments
-        run: |
-          kubectl apply -f k8s/Namespace/
-          kubectl apply -f k8s/Frontend/
-          kubectl apply -f k8s/Backend/
-          kubectl apply -f k8s/Mysql/
-          kubectl apply -f k8s/Redis/
-          kubectl apply -f k8s/Media/
-          kubectl apply -f k8s/Ingress/
+  steps:
+    - name: 📂 Checkout du code
+      uses: actions/checkout@v4      
 
-      - name: 🔄 Redéployer pods avec les nouvelles images
-        run: |
-          kubectl set image deployment/django-backend \
-            django-backend=${{ env.DOCKERHUB_USERNAME }}/freelance-backend:${{ env.IMAGE_TAG }} -n freelance
-          kubectl set image deployment/frontend \
-            frontend=${{ env.DOCKERHUB_USERNAME }}/freelance-frontend:${{ env.IMAGE_TAG }} -n freelance
+    - name: 🚀 Vérification et démarrage Minikube
+      run: |
+        echo "⏳ Vérification de l'état du cluster Minikube..."
+        if ! minikube status >/dev/null 2>&1; then
+          echo "Minikube non démarré, démarrage..."
+          minikube start --driver=docker
+        else
+          echo "Minikube déjà démarré"
+        fi
+        echo "🔍 Contexte kubectl actuel :"
+        kubectl config current-context
+        kubectl cluster-info
 
-      - name: 🔄 Vérification du déploiement
-        run: |
-          kubectl rollout status deployment/django-backend -n freelance
-          kubectl rollout status deployment/frontend -n freelance
+    - name: 🚀 Application des manifests Kubernetes
+      run: |
+        echo "⏳ Application des manifests..."
+        kubectl apply -f k8s/Namespace/
+        kubectl apply -f k8s/Mysql/
+        kubectl apply -f k8s/Redis/
+        kubectl apply -f k8s/Media/
+        kubectl apply -f k8s/Backend/
+        kubectl apply -f k8s/Frontend/
+        kubectl apply -f k8s/Ingress/
+
+    - name: ⚙️ Déploiement versionné des images
+      run: |
+        echo "🔄 Mise à jour des images avec tag $IMAGE_TAG..."
+        kubectl set image deployment/django-backend \
+          django-backend=${{ env.DOCKERHUB_USERNAME }}/freelance-backend:${{ env.IMAGE_TAG }} -n freelance
+        kubectl set image deployment/frontend \
+          frontend=${{ env.DOCKERHUB_USERNAME }}/freelance-frontend:${{ env.IMAGE_TAG }} -n freelance
+
+    - name: ⏳ Vérification du rollout
+      run: |
+        echo "📦 Statut des déploiements après mise à jour..."
+        kubectl rollout status deployment/django-backend -n freelance
+        kubectl rollout status deployment/frontend -n freelance
