@@ -140,6 +140,8 @@ jobs:
           kubectl apply -f k8s/Mysql/
           kubectl apply -f k8s/Redis/
           kubectl apply -f k8s/Media/
+          kubectl apply -f k8s/Ingress/
+          kubectl apply -f k8s/Namespace/
 
       - name: 🔄 Redéployer pods avec les nouvelles images
         run: |
