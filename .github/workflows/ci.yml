@@ -12,7 +12,6 @@ jobs:
 
     # Variables disponibles pour toutes les étapes
     env:
-      IMAGE_TAG: ${{ github.run_number }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
       MYSQL_USER: ${{ secrets.MYSQL_USER }}
@@ -116,12 +115,13 @@ jobs:
  
       - name: 🏗️ Build et push du backend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/freelance-backend:${{ env.IMAGE_TAG }} ./backend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/freelance-backend:${{ env.IMAGE_TAG }}      
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/freelance-backend:latest ./backend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/freelance-backend:latest
+
       - name: 🏗️ Build et push du frontend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/freelance-frontend:${{ env.IMAGE_TAG }} ./frontend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/freelance-frontend:${{ env.IMAGE_TAG }}
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/freelance-frontend:latest ./frontend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/freelance-frontend:latest
 
     # -----------------------------
   # Job 2 : Déploiement (CD)
@@ -135,17 +135,15 @@ jobs:
 
       - name: 🚀 Déployer les Deployments
         run: |
-          kubectl apply -f k8s/Namespace/
           kubectl apply -f k8s/Frontend/
           kubectl apply -f k8s/Backend/
           kubectl apply -f k8s/Mysql/
           kubectl apply -f k8s/Redis/
           kubectl apply -f k8s/Media/
           kubectl apply -f k8s/Ingress/
+          kubectl apply -f k8s/Namespace/
 
-      - name: ⚙️ Mise à jour des images (rolling update)
+      - name: 🔄 Redéployer pods avec les nouvelles images
         run: |
-          kubectl set image deployment/django-backend \
-            django-backend=${{ env.DOCKERHUB_USERNAME }}/freelance-backend:${{ env.IMAGE_TAG }} -n freelance
-          kubectl set image deployment/frontend \
-            frontend=${{ env.DOCKERHUB_USERNAME }}/freelance-frontend:${{ env.IMAGE_TAG }} -n freelance
+          kubectl rollout restart deployment django-backend
+          kubectl rollout restart deployment frontend
