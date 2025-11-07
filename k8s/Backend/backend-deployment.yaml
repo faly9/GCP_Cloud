@@ -14,7 +14,7 @@ spec:
         app: django-backend
     spec:
       containers:
-        - name: django
+        - name: django-backend
           image: faly9/freelance-backend:latest
           imagePullPolicy: Always
           ports:
