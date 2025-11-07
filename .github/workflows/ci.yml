@@ -1,4 +1,4 @@
-name: CI - Django + React + Redis + MySQL + Docker Hub
+name: CI/CD - Django + React + Redis + MySQL + Docker Hub + Kubernetes
 
 on:
   push:
@@ -7,18 +7,21 @@ on:
     branches: ["main"]
 
 jobs:
+  # -----------------------------
+  # 🧪 Étape 1 : Build & Tests (CI)
+  # -----------------------------
   build-test:
     runs-on: ubuntu-latest
 
-    # Variables disponibles pour toutes les étapes
     env:
+      # 🏷️ Tag unique pour chaque exécution du pipeline
+      IMAGE_TAG: ${{ github.run_number }}
+
+      # 🔐 Variables d'environnement sensibles
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
       MYSQL_USER: ${{ secrets.MYSQL_USER }}
       MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-      DB_NAME: ${{ secrets.MYSQL_DATABASE }}
-      DB_USER: ${{ secrets.MYSQL_USER }}
-      DB_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
       DB_HOST: 127.0.0.1
       EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
       EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
@@ -26,9 +29,9 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
     services:
+      # 🗄️ Base de données MySQL
       mysql:
         image: mysql:8.0
-        # ⚠️ Ces variables sont utilisées *dans* le conteneur MySQL
         env:
           MYSQL_ROOT_PASSWORD: faly09+/+
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
@@ -42,6 +45,7 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
+      # ⚡ Cache Redis
       redis:
         image: redis:latest
         ports:
@@ -53,32 +57,32 @@ jobs:
           --health-retries=5
 
     steps:
-      - name: 🧩 Checkout du code
+      - name: 📦 Récupération du code
         uses: actions/checkout@v4
         with:
           submodules: true
 
-      - name: 🐍 Installer Python
+      - name: 🐍 Installation de Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: 📦 Installer dépendances backend
+      - name: 📦 Installation des dépendances backend
         working-directory: ./backend
         run: pip install -r requirements.txt
 
-      - name: ⏳ Attente que MySQL démarre
+      - name: ⏳ Vérification du service MySQL
         run: |
-          echo "⏳ Vérification du service MySQL..."
+          echo "⏳ Attente du démarrage de MySQL..."
           for i in {1..6}; do
             if mysqladmin ping -h 127.0.0.1 -uroot -pfaly09+/+ > /dev/null 2>&1; then
-              echo "✅ MySQL est prêt !"
+              echo "✅ MySQL est prêt."
               exit 0
             fi
-            echo "MySQL pas encore prêt... tentative $i/6"
+            echo "⏱️ Tentative $i/6 : MySQL non prêt..."
             sleep 10
           done
-          echo "❌ MySQL n’a pas démarré à temps."
+          echo "❌ Échec : MySQL ne s'est pas lancé à temps."
           exit 1
 
       - name: 🔧 Migrations Django
@@ -91,16 +95,16 @@ jobs:
           daphne -b 0.0.0.0 -p 8000 backend.asgi:application &
           python manage.py test
 
-      - name: 🧰 Installer Node.js
+      - name: ⚙️ Installation de Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: 📦 Installer dépendances frontend
+      - name: 📦 Installation des dépendances frontend
         working-directory: ./frontend
         run: npm install
 
-      - name: 🔍 Build frontend (Vite)
+      - name: 🔍 Build du frontend (Vite)
         working-directory: ./frontend
         env:
           VITE_API_URL: http://localhost:8000
@@ -112,38 +116,44 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
- 
-      - name: 🏗️ Build et push du backend
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/freelance-backend:latest ./backend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/freelance-backend:latest
 
-      - name: 🏗️ Build et push du frontend
+      - name: 🏗️ Build & Push du backend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/freelance-frontend:latest ./frontend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/freelance-frontend:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/freelance-backend:${{ env.IMAGE_TAG }} ./backend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/freelance-backend:${{ env.IMAGE_TAG }}
 
-    # -----------------------------
-  # Job 2 : Déploiement (CD)
+      - name: 🏗️ Build & Push du frontend
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/freelance-frontend:${{ env.IMAGE_TAG }} ./frontend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/freelance-frontend:${{ env.IMAGE_TAG }}
+
+  # -----------------------------
+  # 🚀 Étape 2 : Déploiement (CD)
   # -----------------------------
   deploy:
-    runs-on: self-hosted      # ton runner local avec Minikube
-    needs: build-test          # attendre que CI soit terminé
+    runs-on: self-hosted        # Runner local avec Minikube
+    needs: build-test           # Attend la fin du job CI
+    env:
+      IMAGE_TAG: ${{ github.run_number }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
     steps:
-      - name: 🧩 Checkout code
+      - name: 📂 Checkout du code
         uses: actions/checkout@v4      
 
-      - name: 🚀 Déployer les Deployments
+      - name: 🚀 Application des manifests Kubernetes
         run: |
           kubectl apply -f k8s/Namespace/
-          kubectl apply -f k8s/Frontend/
-          kubectl apply -f k8s/Backend/
           kubectl apply -f k8s/Mysql/
           kubectl apply -f k8s/Redis/
           kubectl apply -f k8s/Media/
+          kubectl apply -f k8s/Backend/
+          kubectl apply -f k8s/Frontend/
           kubectl apply -f k8s/Ingress/
 
-      - name: 🔄 Redéployer pods avec les nouvelles images
+      - name: ⚙️ Déploiement versionné
         run: |
-          kubectl rollout restart deployment django-backend
-          kubectl rollout restart deployment frontend
+          kubectl set image deployment/django-backend \
+            django-backend=${{ env.DOCKERHUB_USERNAME }}/freelance-backend:${{ env.IMAGE_TAG }} -n freelance
+          kubectl set image deployment/frontend \
+            frontend=${{ env.DOCKERHUB_USERNAME }}/freelance-frontend:${{ env.IMAGE_TAG }} -n freelance

@@ -16,6 +16,7 @@ spec:
       containers:
         - name: django
           image: faly9/freelance-backend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
           envFrom:

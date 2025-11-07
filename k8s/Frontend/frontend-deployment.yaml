@@ -34,6 +34,7 @@ spec:
       containers:
         - name: frontend
           image: faly9/freelance-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           volumeMounts:
