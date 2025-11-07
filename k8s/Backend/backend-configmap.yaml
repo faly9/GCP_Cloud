@@ -10,5 +10,5 @@ data:
   DB_PORT: "3306"
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"
-  FRONTEND_URL: "http://192.168.88.27:5173"
+  FRONTEND_URL: "http://freelance.stage:30000"
   

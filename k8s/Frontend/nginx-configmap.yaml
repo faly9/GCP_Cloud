@@ -6,7 +6,7 @@ data:
   default.conf: |
     server {
         listen 80;
-        server_name localhost;
+        server_name freelances.stage;
 
         root /usr/share/nginx/html;
         index index.html index.htm;
