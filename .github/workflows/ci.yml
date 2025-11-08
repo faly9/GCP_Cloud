@@ -159,7 +159,7 @@ jobs:
           kubectl apply -f k8s/Media/
           kubectl apply -f k8s/Prometheus/
           kubectl apply -f k8s/Grafana/
-          kubectl apply -f k8s/Mysqld-Exporter/
+          kubectl apply -f k8s/Mysqld-exporter/
           kubectl apply -f k8s/Volume-graf-prom/
           kubectl apply -f k8s/Ingress/
 
