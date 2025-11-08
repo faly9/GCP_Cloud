@@ -14,10 +14,18 @@ spec:
         app: mysqld-exporter
     spec:
       containers:
-      - name: mysqld-exporter
-        image: prom/mysqld-exporter
-        env:
-        - name: DATA_SOURCE_NAME
-          value: "exporter:2975@(mysql.freelance.svc.cluster.local:3306)/"
-        ports:
-        - containerPort: 9104
+        - name: mysqld-exporter
+          image: prom/mysqld-exporter:0.18.0
+          env:
+            - name: DATA_SOURCE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-exporter-secret
+                  key: username
+            - name: DATA_SOURCE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-exporter-secret
+                  key: password
+          ports:
+            - containerPort: 9104
