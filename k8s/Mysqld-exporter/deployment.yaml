@@ -16,16 +16,16 @@ spec:
       containers:
         - name: mysqld-exporter
           image: prom/mysqld-exporter:latest
-          env:
-            - name: DATA_SOURCE_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-exporter-secret
-                  key: username
-            - name: DATA_SOURCE_PASS
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-exporter-secret
-                  key: password
           ports:
             - containerPort: 9104
+          env:
+            - name: DATA_SOURCE_NAME
+              value: "exporter:2975@(mysql:3306)/"
+          volumeMounts:
+            - name: mysql-config
+              mountPath: /etc/mysql/.my.cnf
+              subPath: .my.cnf
+      volumes:
+        - name: mysql-config
+          secret:
+            secretName: mysqld-exporter-secret
