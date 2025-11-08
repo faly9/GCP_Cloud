@@ -148,6 +148,9 @@ jobs:
           echo "🔍 Contexte kubectl actuel :"
             kubectl config current-context
           kubectl cluster-info
+      - name: Enable Minikube Ingress Addon
+        run: |
+          minikube addons enable ingress
 
       - name: 🚀 Déployer les Deployments
         run: |
