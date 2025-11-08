@@ -10,7 +10,7 @@ data:
     scrape_configs:
       - job_name: 'django'
         static_configs:
-          - targets: ['backend:8000']
+          - targets: ['backend.freelance.svc.cluster.local:8000']
       - job_name: 'mysql'
         static_configs:
-          - targets: ['mysqld-exporter:9104']
+          - targets: ['mysqld-exporter.freelance.svc.cluster.local:9104']
