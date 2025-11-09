@@ -21,27 +21,7 @@ spec:
           env:
             - name: DATA_SOURCE_NAME
               value: "exporter:2975@(mysql:3306)/"
-          volumeMounts:
-            - name: mysql-config
-              mountPath: /etc/mysql/.my.cnf
-              subPath: .my.cnf
-      volumes:
-        - name: mysql-config
-          secret:
-            secretName: mysqld-exporter-config
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: mysqld-exporter-config
-  namespace: freelance
-type: Opaque
-stringData:
-  .my.cnf: |
-    [client]
-    user=exporter
-    password=2975
-    host=mysql
+              
 ---
 apiVersion: v1
 kind: Service
