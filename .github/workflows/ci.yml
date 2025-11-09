@@ -142,7 +142,7 @@ jobs:
           if ! minikube status >/dev/null 2>&1; then
             echo "Minikube non démarré, démarrage..."
             minikube start --driver=docker
-          el  se
+          else
             echo "Minikube déjà démarré"
           fi
           echo "🔍 Contexte kubectl actuel :"
