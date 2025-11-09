@@ -1,3 +1,4 @@
+# mysqld-exporter-deployment.yaml (Corrigé)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,9 +20,12 @@ spec:
           ports:
             - containerPort: 9104
           env:
+            # ⭐ CORRECTION MAJEURE: Utilisation du Secret pour le DSN ⭐
             - name: DATA_SOURCE_NAME
-              value: "exporter:2975@(mysql:3306)/"
-              
+              valueFrom:
+                secretKeyRef:
+                  name: mysqld-exporter-dsn  
+                  key: DATA_SOURCE_NAME      
 ---
 apiVersion: v1
 kind: Service
