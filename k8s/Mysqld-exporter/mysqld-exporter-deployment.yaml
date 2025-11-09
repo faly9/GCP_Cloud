@@ -1,9 +1,11 @@
-# mysqld-exporter-deployment.yaml (Corrigé)
+# mysqld-exporter-deployment.yaml (Configuration du ConfigMap)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysqld-exporter
   namespace: freelance
+  labels:
+    app: mysqld-exporter
 spec:
   replicas: 1
   selector:
@@ -19,13 +21,27 @@ spec:
           image: prom/mysqld-exporter:latest
           ports:
             - containerPort: 9104
-          env:
-            # ⭐ CORRECTION MAJEURE: Utilisation du Secret pour le DSN ⭐
-            - name: DATA_SOURCE_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: mysqld-exporter-dsn  
-                  key: DATA_SOURCE_NAME      
+              name: metrics
+          # NOUVEAU : Arguments pour pointer vers le fichier de configuration
+          args:
+            - --config.my-cnf=/etc/mysqld-exporter/my.cnf
+            - --collect.global_status
+            - --web.listen-address=:9104
+          # NOUVEAU : Montage du ConfigMap
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mysqld-exporter/
+              readOnly: true
+          # SUPPRIMER ICI LA SECTION 'env' DATA_SOURCE_NAME (si elle existe)
+          # ...
+      # NOUVEAU : Définition du Volume ConfigMap
+      volumes:
+        - name: config
+          configMap:
+            name: mysqld-exporter-config # Nom du ConfigMap créé à l'étape 1
+            items:
+              - key: my.cnf
+                path: my.cnf
 ---
 apiVersion: v1
 kind: Service
