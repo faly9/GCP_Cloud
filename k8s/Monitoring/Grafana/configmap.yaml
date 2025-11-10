@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  django-dashboard.json: |
+    {{ include "monitoring/dashboards/django-dashboard.json" | indent 4 }}
+  mysql-dashboard.json: |
+    {{ include "monitoring/dashboards/mysql-dashboard.json" | indent 4 }}
+  node-exporter-dashboard.json: |
+    {{ include "monitoring/dashboards/node-exporter-dashboard.json" | indent 4 }}
+  kube-state-dashboard.json: |
+    {{ include "monitoring/dashboards/kube-state-dashboard.json" | indent 4 }}
