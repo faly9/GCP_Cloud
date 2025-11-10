@@ -42,20 +42,3 @@ spec:
             items:
               - key: my.cnf
                 path: my.cnf
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mysqld-exporter
-  namespace: freelance
-  labels:
-    app: mysqld-exporter
-spec:
-  selector:
-    app: mysqld-exporter
-  ports:
-    - name: http
-      port: 9104
-      targetPort: 9104
-      protocol: TCP
-  type: ClusterIP
