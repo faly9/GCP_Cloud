@@ -11,4 +11,4 @@ spec:
       targetPort: 9100
       protocol: TCP
       name: http
-  clusterIP: None
+  
