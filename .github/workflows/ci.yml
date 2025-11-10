@@ -161,7 +161,6 @@ jobs:
           kubectl apply -f k8s/Redis/
           kubectl apply -f k8s/Media/
           kubectl apply -f k8s/Monitoring/
-          kubectl apply -f k8s/Volume-graf-prom/
           kubectl apply -f k8s/Ingress/
 
       - name: 🔄 Redéployer pods avec les nouvelles images
