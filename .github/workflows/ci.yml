@@ -160,7 +160,7 @@ jobs:
           kubectl apply -f k8s/Mysql/
           kubectl apply -f k8s/Redis/
           kubectl apply -f k8s/Media/
-          kubectl apply -f k8s/Monitoring/
+          kubectl apply -f k8s/Monitoring/ --recursive
           kubectl apply -f k8s/Ingress/
 
       - name: 🔄 Redéployer pods avec les nouvelles images
