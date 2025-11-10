@@ -29,7 +29,7 @@ spec:
             - name: grafana-storage
               mountPath: /var/lib/grafana
             - name: grafana-dashboards
-              mountPath: /var/lib/grafana/dashboards
+              mountPath: /var/lib/grafana/provisioning/dashboards
       volumes:
         - name: grafana-storage
           persistentVolumeClaim:
