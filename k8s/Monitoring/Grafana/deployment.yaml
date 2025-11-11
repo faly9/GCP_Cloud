@@ -26,14 +26,29 @@ spec:
             - name: GF_SECURITY_ADMIN_PASSWORD
               value: "admin"
           volumeMounts:
+            # 1️⃣ Dashboards JSON
+            - name: grafana-dashboards
+              mountPath: /var/lib/grafana/dashboards
+
+            # 2️⃣ Fichier de provisioning YAML
+            - name: grafana-provisioning
+              mountPath: /etc/grafana/provisioning/dashboards
+              
+            # 3️⃣ Stockage persistant
             - name: grafana-storage
               mountPath: /var/lib/grafana
-            - name: grafana-dashboards
-              mountPath: /var/lib/grafana/provisioning/dashboards
       volumes:
+        # PVC pour les données
         - name: grafana-storage
           persistentVolumeClaim:
             claimName: grafana-pvc
+
+        # ConfigMap contenant les dashboards JSON
         - name: grafana-dashboards
           configMap:
             name: grafana-dashboards
+
+        # ConfigMap contenant le fichier dashboards.yaml (provisioning)
+        - name: grafana-provisioning
+          configMap:
+            name: grafana-provisioning
