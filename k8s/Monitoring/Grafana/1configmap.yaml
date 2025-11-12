@@ -8,7 +8,7 @@ metadata:
 data:
   django-dashboard.json: |
     {
-      "title": "Surveillance Django",
+      "title": "Surveillance Django soutenance",
       "uid": "django-dashboard",
       "schemaVersion": 30,
       "panels": [
@@ -16,7 +16,7 @@ data:
           "type": "timeseries",
           "title": "Requêtes HTTP par seconde",
           "targets": [
-            { "expr": "rate(django_http_requests_total[1m])", "legendFormat": "Req/s" }
+            { "expr": "sum(rate(django_http_requests_total_by_method_total[1m]))", "legendFormat": "Requêtes/s" }
           ],
           "gridPos": { "x": 0, "y": 0, "w": 12, "h": 6 }
         },
@@ -26,22 +26,38 @@ data:
           "targets": [
             { "expr": "rate(django_http_response_time_seconds_sum[5m]) / rate(django_http_response_time_seconds_count[5m])", "legendFormat": "Temps moyen" }
           ],
-          "gridPos": { "x": 0, "y": 6, "w": 12, "h": 6 }
+          "gridPos": { "x": 12, "y": 0, "w": 12, "h": 6 }
         },
         {
           "type": "stat",
-          "title": "Erreurs 500",
+          "title": "Erreurs 500 (5m)",
           "targets": [
-            { "expr": "sum(increase(django_http_responses_total{status='500'}[5m]))" }
+            { "expr": "sum(increase(django_http_responses_total_by_status_total{status='500'}[5m]))" }
           ],
-          "gridPos": { "x": 12, "y": 0, "w": 6, "h": 6 }
+          "gridPos": { "x": 0, "y": 6, "w": 6, "h": 6 }
+        },
+        {
+          "type": "timeseries",
+          "title": "Taille de la base de données",
+          "targets": [
+            { "expr": "django_db_size_bytes", "legendFormat": "DB Size (bytes)" }
+          ],
+          "gridPos": { "x": 6, "y": 6, "w": 12, "h": 6 }
+        },
+        {
+          "type": "stat",
+          "title": "Sessions actives",
+          "targets": [
+            { "expr": "django_sessions_total" }
+          ],
+          "gridPos": { "x": 18, "y": 6, "w": 6, "h": 6 }
         }
       ]
     }
 
   mysql-dashboard.json: |
     {
-      "title": "Surveillance MySQL",
+      "title": "Surveillance MySQL soutenance",
       "uid": "mysql-dashboard",
       "schemaVersion": 30,
       "panels": [
@@ -68,13 +84,29 @@ data:
             { "expr": "(mysql_global_status_buffer_pool_bytes_data / mysql_global_status_buffer_pool_bytes_total) * 100" }
           ],
           "gridPos": { "x": 0, "y": 6, "w": 6, "h": 6 }
+        },
+        {
+          "type": "timeseries",
+          "title": "Threads en attente",
+          "targets": [
+            { "expr": "mysql_global_status_threads_running" }
+          ],
+          "gridPos": { "x": 6, "y": 6, "w": 12, "h": 6 }
+        },
+        {
+          "type": "stat",
+          "title": "Uptime (heures)",
+          "targets": [
+            { "expr": "mysql_global_status_uptime / 3600" }
+          ],
+          "gridPos": { "x": 18, "y": 6, "w": 6, "h": 6 }
         }
       ]
     }
 
   kube-state-dashboard.json: |
     {
-      "title": "Surveillance Kube-State Metrics",
+      "title": "Surveillance Kube-State Metrics soutenance",
       "uid": "kube-dashboard",
       "schemaVersion": 30,
       "panels": [
@@ -88,32 +120,48 @@ data:
         },
         {
           "type": "stat",
-          "title": "Nombre total de déploiements",
+          "title": "Total de déploiements",
           "targets": [
             { "expr": "count(kube_deployment_created)" }
           ],
-          "gridPos": { "x": 0, "y": 6, "w": 6, "h": 6 }
+          "gridPos": { "x": 12, "y": 0, "w": 6, "h": 6 }
         },
         {
           "type": "timeseries",
-          "title": "Pods en état Running",
+          "title": "Pods Running",
           "targets": [
             { "expr": "count(kube_pod_status_phase{phase='Running'})" }
           ],
-          "gridPos": { "x": 6, "y": 6, "w": 12, "h": 6 }
+          "gridPos": { "x": 0, "y": 6, "w": 12, "h": 6 }
+        },
+        {
+          "type": "timeseries",
+          "title": "Redémarrages de conteneurs",
+          "targets": [
+            { "expr": "sum(rate(kube_pod_container_status_restarts_total[5m]))" }
+          ],
+          "gridPos": { "x": 12, "y": 6, "w": 12, "h": 6 }
+        },
+        {
+          "type": "stat",
+          "title": "Nombre de namespaces",
+          "targets": [
+            { "expr": "count(kube_namespace_created)" }
+          ],
+          "gridPos": { "x": 18, "y": 6, "w": 6, "h": 6 }
         }
       ]
     }
 
   node-exporter-dashboard.json: |
     {
-      "title": "Surveillance Système (Node Exporter)",
+      "title": "Surveillance Système (Node Exporter) soutenance",
       "uid": "node-dashboard",
       "schemaVersion": 30,
       "panels": [
         {
           "type": "gauge",
-          "title": "Utilisation CPU (%)",
+          "title": "CPU Utilisation (%)",
           "targets": [
             { "expr": "100 - (avg by (instance)(rate(node_cpu_seconds_total{mode='idle'}[5m])) * 100)" }
           ],
@@ -134,6 +182,22 @@ data:
             { "expr": "(1 - (node_filesystem_avail_bytes{mountpoint='/'} / node_filesystem_size_bytes{mountpoint='/'})) * 100" }
           ],
           "gridPos": { "x": 12, "y": 0, "w": 6, "h": 6 }
+        },
+        {
+          "type": "timeseries",
+          "title": "Charge système (1m)",
+          "targets": [
+            { "expr": "node_load1" }
+          ],
+          "gridPos": { "x": 0, "y": 6, "w": 12, "h": 6 }
+        },
+        {
+          "type": "timeseries",
+          "title": "Vitesse réseau (bytes/s)",
+          "targets": [
+            { "expr": "rate(node_network_receive_bytes_total[1m]) + rate(node_network_transmit_bytes_total[1m])" }
+          ],
+          "gridPos": { "x": 12, "y": 6, "w": 12, "h": 6 }
         }
       ]
     }
