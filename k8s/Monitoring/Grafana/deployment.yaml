@@ -27,12 +27,12 @@ spec:
               value: "admin"
           volumeMounts:
             # 1️⃣ Dashboards JSON
-            - name: grafana-dashboards
-              mountPath: /var/lib/grafana/dashboards
+            # - name: grafana-dashboards
+            #   mountPath: /var/lib/grafana/dashboards
 
             # 2️⃣ Fichier de provisioning YAML
-            - name: grafana-provisioning
-              mountPath: /etc/grafana/provisioning/dashboards
+            # - name: grafana-provisioning
+            #   mountPath: /etc/grafana/provisioning/dashboards
               
             # 3️⃣ Stockage persistant
             - name: grafana-storage
@@ -44,11 +44,11 @@ spec:
             claimName: grafana-pvc
 
         # ConfigMap contenant les dashboards JSON
-        - name: grafana-dashboards
-          configMap:
-            name: grafana-dashboards
+        # - name: grafana-dashboards
+        #   configMap:
+        #     name: grafana-dashboards
 
         # ConfigMap contenant le fichier dashboards.yaml (provisioning)
-        - name: grafana-provisioning
-          configMap:
-            name: grafana-provisioning
+        # - name: grafana-provisioning
+        #   configMap:
+        #     name: grafana-provisioning
