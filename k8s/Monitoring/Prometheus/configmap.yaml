@@ -21,5 +21,9 @@ data:
         static_configs:
           - targets: ['kube-state-metrics.monitoring.svc.cluster.local:8080']
       - job_name: 'cadvisor'
+        scheme: https
+        tls_config:
+          insecure_skip_verify: true
         static_configs:
-          - targets: ['prometheus-kube-prometheus-kubelet.kube-system.svc.cluster.local:4194']
+          - targets: ['prometheus-kube-prometheus-kubelet.kube-system.svc.cluster.local:10250']
+        metrics_path: /metrics/cadvisor
