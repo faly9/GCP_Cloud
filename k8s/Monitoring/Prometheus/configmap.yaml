@@ -27,3 +27,4 @@ data:
         static_configs:
           - targets: ['prometheus-kube-prometheus-kubelet.kube-system.svc.cluster.local:10250']
         metrics_path: /metrics/cadvisor
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
