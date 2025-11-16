@@ -52,27 +52,8 @@ data:
             - 'prometheus-kube-prometheus-kubelet.kube-system.svc.cluster.local:10250'
 
       # -----------------------------
-      # cAdvisor metrics (conteneurs)
+      # Prometheus itself
       # -----------------------------
-      - job_name: 'kubelet-cadvisor'
-        scheme: https
-        tls_config:
-          insecure_skip_verify: true
-        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-        metrics_path: /metrics/cadvisor
+      - job_name: 'cadvisor'
         static_configs:
-          - targets:
-            - 'prometheus-kube-prometheus-kubelet.kube-system.svc.cluster.local:10250'
-
-      # -----------------------------
-      # Resource metrics
-      # -----------------------------
-      - job_name: 'kubelet-resource'
-        scheme: https
-        tls_config:
-          insecure_skip_verify: true
-        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-        metrics_path: /metrics/resource
-        static_configs:
-          - targets:
-            - 'prometheus-kube-prometheus-kubelet.kube-system.svc.cluster.local:10250'
+          - targets: ['cadvisor.monitoring.svc.cluster.local:8080']
