@@ -13,7 +13,6 @@ spec:
       labels:
         app: prometheus
     spec:
-      # serviceAccountName: prometheus-kubelet
       containers:
       - name: prometheus
         image: prom/prometheus
