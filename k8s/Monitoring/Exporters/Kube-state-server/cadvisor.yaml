@@ -27,6 +27,13 @@ spec:
         - containerPort: 8080
           hostPort: 8080
           name: http
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
         volumeMounts:
         - name: rootfs
           mountPath: /rootfs
