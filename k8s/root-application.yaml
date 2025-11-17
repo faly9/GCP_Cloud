@@ -11,8 +11,31 @@ spec:
     path: k8s/apps
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: default
+    namespace: freelance
   syncPolicy:
     automated:
       selfHeal: true
       prune: true
+
+---
+# -----------------------------
+# Application enfant : monitoring
+# -----------------------------
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring-app
+  namespace: argocd
+spec:
+  project: FullStack_Freelance
+  source:
+    repoURL: https://github.com/faly9/FullStack_Freelance
+    path: k8s/Monitoring
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
