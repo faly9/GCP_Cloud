@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    image: backend-app:latest
+
+  frontend:
+    build: ./frontend
+    image: frontend-app:latest
