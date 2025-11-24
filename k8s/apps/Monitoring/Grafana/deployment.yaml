@@ -15,6 +15,8 @@ spec:
       labels:
         app: grafana
     spec:
+      securityContext:
+        fsGroup: 472
       containers:
         - name: grafana
           image: grafana/grafana:latest
@@ -25,7 +27,7 @@ spec:
               value: "admin"
             - name: GF_SECURITY_ADMIN_PASSWORD
               value: "admin"
-          volumeMounts:
+         
             # 1️⃣ Dashboards JSON
             # - name: grafana-dashboards
             #   mountPath: /var/lib/grafana/dashboards
@@ -35,10 +37,15 @@ spec:
             #   mountPath: /etc/grafana/provisioning/dashboards
               
             # 3️⃣ Stockage persistant
+          securityContext:
+            runAsUser: 472
+            runAsGroup: 472
+           
+           
+          volumeMounts:
             - name: grafana-storage
               mountPath: /var/lib/grafana
       volumes:
-        # PVC pour les données
         - name: grafana-storage
           persistentVolumeClaim:
             claimName: grafana-pvc
