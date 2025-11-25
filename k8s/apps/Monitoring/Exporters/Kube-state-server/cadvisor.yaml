@@ -29,11 +29,11 @@ spec:
           name: http
         resources:
           requests:
-            memory: "150Mi"
-            cpu: "40m"
-          limits:
             memory: "200Mi"
-            cpu: "80m"
+            cpu: "100m"
+          limits:
+            memory: "500Mi"
+            cpu: "400m"
         volumeMounts:
         - name: rootfs
           mountPath: /rootfs

@@ -42,6 +42,4 @@ spec:
         - name: gcs-credentials
           secret:
             secretName: gcs-credentials
-            items:
-              - key: key.json
-                path: key.json
+         
